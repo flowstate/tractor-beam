@@ -1,19 +1,19 @@
 'use client'
 
-import { type LocationId, type TractorModelId } from '~/lib/types/types'
+import { format, parseISO } from 'date-fns'
 import {
-  LineChart,
+  CartesianGrid,
+  Legend,
   Line,
+  LineChart,
+  ReferenceLine,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  ReferenceLine,
 } from 'recharts'
-import { format, parseISO } from 'date-fns'
 import type { SavedDemandForecast } from '~/lib/prediction/prediction.types'
+import { type LocationId, type TractorModelId } from '~/lib/types/types'
 
 interface DemandForecastChartProps {
   forecast: SavedDemandForecast | undefined
@@ -61,7 +61,8 @@ export function DemandForecastChart({
   const formatDate = (dateStr: string) => {
     try {
       return format(parseISO(dateStr), 'MMM d')
-    } catch (e) {
+    } catch (error) {
+      console.error('Error formatting date:', error)
       return dateStr
     }
   }

@@ -1,30 +1,28 @@
-import { z } from 'zod'
-import { createTRPCRouter, publicProcedure } from '../trpc'
-import { PrismaClient, RecommendationImpact } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
 import { extractHistoricalData } from '~/lib/analysis/data-extraction'
 import { getLatestAnalysisResults } from '~/lib/analysis/storage'
 import { getLatestSupplierPerformanceForecast } from '~/lib/prediction/supplier-performance-prediction'
 import { getLatestLocationReports } from '~/lib/recommendation/current-strategy'
+import { createTRPCRouter, publicProcedure } from '../trpc'
 
-import type {
-  ComponentId,
-  LocationId,
-  SupplierId,
-  TractorModelId,
-  RecommendationUrgency,
-  RecommendationImpactLevel,
-  RecommendationPriority,
-} from '~/lib/types/types'
-import { TRACTOR_MODELS, SUPPLIERS, COMPONENTS } from '~/lib/constants'
+import { COMPONENTS, TRACTOR_MODELS } from '~/lib/constants'
 import type {
   ForecastPoint,
   ForecastSummary,
 } from '~/lib/prediction/prediction.types'
 import type {
-  ReasonedAllocationStrategy,
   QuarterlyCard,
+  ReasonedAllocationStrategy,
 } from '~/lib/recommendation/recommendation.types'
-import { makeLocationComponentRecord } from '~/lib/utils'
+import type {
+  ComponentId,
+  LocationId,
+  RecommendationImpactLevel,
+  RecommendationPriority,
+  RecommendationUrgency,
+  SupplierId,
+  TractorModelId,
+} from '~/lib/types/types'
 import {
   type InventoryDataPoint,
   type InventorySimulationData,
@@ -41,10 +39,6 @@ async function simulateInventoryLevels(
   modelId: TractorModelId,
   componentId: ComponentId
 ): Promise<InventorySimulationData> {
-  // Constants
-  const DAYS_PER_QUARTER = 90
-  const TOTAL_DAYS = DAYS_PER_QUARTER * 2 // Q1 + Q2
-
   // 1. Get the starting inventory level from the latest location report
   const locationReports = await getLatestLocationReports()
   const heartlandReport = locationReports.find(
@@ -278,10 +272,6 @@ function createSimulationWithDefaults(
       y: Math.max(0, optimalInventory + randomVariation),
     })
   }
-
-  // Q2: Start with ending inventory from Q1, add bulk order for Q2 demand plus safety stock
-  // Note: optimalInventory now contains the ending inventory from Q1
-  const q1EndingInventory = optimalInventory
 
   for (let day = 0; day < DAYS_PER_QUARTER; day++) {
     // Use the adjusted Q2 demand to emphasize seasonality

@@ -19,7 +19,7 @@ export function DemandViz({ data }: DemandVizProps) {
 
         <div className="mx-auto max-w-3xl rounded-lg border bg-gradient-to-r from-blue-50 to-purple-50 p-6 text-center shadow-sm">
           <p className="mb-4 text-gray-700">
-            We've generated 3 years of historical data (2022-2024) for our
+            We&apos;ve generated 3 years of historical data (2022-2024) for our
             tractor supply chain system, focusing on the{' '}
             <span className="font-semibold text-green-600">TX-300 model</span>{' '}
             in the{' '}
@@ -97,7 +97,7 @@ export function DemandViz({ data }: DemandVizProps) {
           <div className="flex w-full items-center lg:w-1/2">
             <div className="space-y-4">
               <p className="text-gray-700">
-                Using Facebook's Prophet, we forecast demand with{' '}
+                Using Facebook&apos;s Prophet, we forecast demand with{' '}
                 <span className="font-semibold">
                   {data.forecast.metadata.confidenceInterval * 100}% confidence
                   intervals
@@ -178,7 +178,7 @@ export function DemandViz({ data }: DemandVizProps) {
                 {data.metadata.modelSensitivities.market.toFixed(1)}, inflation
                 sensitivity:{' '}
                 {data.metadata.modelSensitivities.inflation.toFixed(1)}),
-                validating our analysis pipeline's accuracy.
+                validating our analysis pipeline&apos;s accuracy.
               </p>
             </div>
           </div>

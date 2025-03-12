@@ -1,14 +1,13 @@
 'use client'
 import { Award, Clock, TrendingUp } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { useCards } from '~/contexts/cards-context'
 import { COMPONENTS } from '~/lib/constants'
 import type { QuarterlyDisplayCard } from '~/lib/recommendation/recommendation.types'
 import { formatCurrency } from '~/lib/utils/formatting'
 import Card from '../ui/card'
-import { useCards } from '~/contexts/cards-context'
 
 // Import card components
-import AllocationReasoning from './card-components/allocation-reasoning'
 import QuantityExplanation, {
   colors as quantityColors,
 } from './card-components/quantity-explanation'

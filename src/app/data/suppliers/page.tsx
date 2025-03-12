@@ -1,16 +1,9 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { api } from '~/trpc/react'
-import type { SupplierId } from '~/lib/types/types'
-import { OriginalQualityChart } from '~/components/data/suppliers/original-quality-chart'
-import { FailureRateChart } from '~/components/data/suppliers/failure-rate-chart'
-import { LeadTimeVarianceChart } from '~/components/data/suppliers/lead-time-variance-chart'
-import { AnalyzedQualityChart } from '~/components/data/suppliers/analyzed-quality-chart'
-import { ForecastChart } from '~/components/data/suppliers/forecast-chart'
-import { ConfidenceIntervalChart } from '~/components/data/suppliers/confidence-interval-chart'
-import { TrendAnalysisSummary } from '~/components/data/suppliers/trend-analysis-summary'
+import { useEffect, useState } from 'react'
 import { SupplierViz } from '~/components/data/suppliers/supplier-viz'
+import type { SupplierId } from '~/lib/types/types'
+import { api } from '~/trpc/react'
 
 // Define the interface for the enhanced visualization data
 export interface EnhancedVisualizationData {

@@ -160,8 +160,7 @@ export function makeEmptyRecommendedStrategy(): Record<
         topLevelRecommendation: '',
         quantityReasoning: {
           summary: '',
-          detailedExplanation: '',
-          safetyStockExplanation: '',
+          historicalDemand: [],
         },
         allocationReasoning: {
           summary: '',

@@ -187,11 +187,6 @@ export async function calculateSupplierAllocation(
 
   // If demand is provided, calculate actual quantities
   if (demand) {
-    // Calculate safety stock portion
-    const safetyStock = demand.quarterlyDemand[0]?.safetyStock || 0
-    const totalRequired = demand.quarterlyDemand[0]?.totalRequired || 0
-    const baseRequired = totalRequired - safetyStock
-
     for (const allocation of allocations) {
       // Calculate base and safety stock quantities separately if we have a safety stock allocation
       const hasSafetyStockAllocation = allocations.some(

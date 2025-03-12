@@ -6,7 +6,7 @@ interface AnalysisInsightsProps {
   data: TypedForecastData
 }
 
-export const AnalysisInsights: React.FC<AnalysisInsightsProps> = ({ data }) => {
+export const AnalysisInsights: React.FC<AnalysisInsightsProps> = () => {
   // Override with our adjusted values with more significant figures
   const adjustedData = [
     {
@@ -83,10 +83,10 @@ export const AnalysisInsights: React.FC<AnalysisInsightsProps> = ({ data }) => {
               legend: 'Sensitivity',
               legendPosition: 'middle',
               legendOffset: -40,
-              format: (value) => value.toFixed(1), // Simplified format
+              format: (value: number) => value.toFixed(1), // Type assertion
               tickValues: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7], // Explicit tick values
             }}
-            tooltip={({ id, value, color, data }) => (
+            tooltip={({ value, color, data }) => (
               <div
                 style={{
                   padding: 12,
@@ -104,8 +104,6 @@ export const AnalysisInsights: React.FC<AnalysisInsightsProps> = ({ data }) => {
             labelTextColor="#ffffff"
             label={(d) => d.data.displayValue.toFixed(2)}
             animate={true}
-            motionStiffness={90}
-            motionDamping={15}
             theme={{
               axis: {
                 ticks: {
@@ -155,10 +153,10 @@ export const AnalysisInsights: React.FC<AnalysisInsightsProps> = ({ data }) => {
               legend: 'Coefficient',
               legendPosition: 'middle',
               legendOffset: -40,
-              format: (value) => value.toFixed(1), // Simplified format
+              format: (value: number) => value.toFixed(1), // Type assertion
               tickValues: [0, 0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4], // Explicit tick values
             }}
-            tooltip={({ id, value, color, data }) => (
+            tooltip={({ value, color, data }) => (
               <div
                 style={{
                   padding: 12,
@@ -176,8 +174,6 @@ export const AnalysisInsights: React.FC<AnalysisInsightsProps> = ({ data }) => {
             labelTextColor="#ffffff"
             label={(d) => d.data.displayValue.toFixed(2)}
             animate={true}
-            motionStiffness={90}
-            motionDamping={15}
             theme={{
               axis: {
                 ticks: {

@@ -92,16 +92,13 @@ export const HistoricalChart: React.FC<HistoricalChartProps> = ({ data }) => {
         yFormat=" >-.1f"
         axisTop={null}
         axisRight={{
-          orient: 'right',
           tickSize: 5,
           tickPadding: 5,
           tickRotation: 0,
           legend: 'Market Trend Index (%)',
           legendOffset: 40,
           legendPosition: 'middle',
-          format: (value) => `${value.toFixed(0)}%`,
-          min: 0,
-          max: percentageAxisMax,
+          format: (value: number) => `${value.toFixed(0)}%`,
         }}
         axisBottom={{
           tickSize: 5,

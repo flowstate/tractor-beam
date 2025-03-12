@@ -1,8 +1,6 @@
 import RecommendationList from '~/components/recommendations/recommendation-list'
 import ShoppingList from '~/components/recommendations/shopping-list'
-import TotalImpactSummary from '~/components/recommendations/total-impact-summary'
 import { CardsProvider } from '~/contexts/cards-context'
-import { Tractor } from 'lucide-react'
 
 export default function Home() {
   return (

@@ -1,7 +1,6 @@
 import { createCallerFactory, createTRPCRouter } from '~/server/api/trpc'
 import { historicalsRouter } from './routers/historicals'
 import { predictionsRouter } from './routers/predictions'
-import { chatRouter } from '~/server/api/routers/chat'
 import { recommendationsRouter } from './routers/recommendations'
 import { outlookRouter } from './routers/outlook'
 import { dataRouter } from './routers/data'
@@ -11,7 +10,7 @@ import { dataRouter } from './routers/data'
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
-  chat: chatRouter,
+
   historicals: historicalsRouter,
   predictions: predictionsRouter,
   recommendations: recommendationsRouter,

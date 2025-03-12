@@ -128,9 +128,9 @@ function RecommendationViz() {
                   <li className="flex items-start">
                     <span className="mr-2 font-bold text-purple-500">→</span>
                     <span>
-                      <strong>What's the recommendation?</strong> I made sure
-                      each card leads with a clear action and financial impact
-                      to provide immediate value.
+                      <strong>What&apos;s the recommendation?</strong> I made
+                      sure each card leads with a clear action and financial
+                      impact to provide immediate value.
                     </span>
                   </li>
                   <li className="flex items-start">
@@ -145,8 +145,8 @@ function RecommendationViz() {
                     <span className="mr-2 font-bold text-purple-500">→</span>
                     <span>
                       <strong>Why these suppliers?</strong> I provided supplier
-                      selection rationale through the "allocation" link, showing
-                      how I optimized for quality, cost, and risk.
+                      selection rationale through the &quot;allocation&quot;
+                      link, showing how I optimized for quality, cost, and risk.
                     </span>
                   </li>
                 </ul>

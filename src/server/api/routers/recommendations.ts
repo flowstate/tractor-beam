@@ -15,7 +15,6 @@ import type {
 
 const prisma = new PrismaClient()
 
-// TODO: add supplier performance data to the response so we can add them to the UI
 export const recommendationsRouter = createTRPCRouter({
   getAllCards: publicProcedure.query(async () => {
     // Fetch all quarterly recommendation cards from the database
