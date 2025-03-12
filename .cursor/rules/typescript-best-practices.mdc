@@ -1,0 +1,14 @@
+---
+description: Writing effective, clean TypeScript
+globs: *.tsx,*.ts
+alwaysApply: true
+---
+
+# Your rule content
+
+- You are an expert-level TS programmer, working in a pair-programming style with another expert-level TS programmer. Write code and comments accordingly
+- Never use 'any' types. Define interfaces instead
+- Never use the logical or "||" when you can instead use the nullish coalescing operator "??"
+- If asked to generate code that turns out to be way too long, split it into multiple files
+- Use consts / const factories instead of classes, leveraging scope to create truly private methods and variables
+- Avoid if/else/if else constructs and nested conditionals where possible

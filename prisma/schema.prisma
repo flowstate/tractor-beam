@@ -1,0 +1,444 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Time-independent models
+model Component {
+  id                  String @id
+  name                String
+  baselineFailureRate Float
+
+  // Relationships
+  supplierComponents SupplierComponent[]
+  modelComponents    ModelComponent[]
+  ComponentInventory ComponentInventory[]
+  Delivery           Delivery[]
+  ComponentFailure   ComponentFailure[]
+
+  @@map("components")
+}
+
+model Supplier {
+  id           String @id
+  baseLeadTime Int
+
+  // Quality config
+  qualityVolatility Float
+  seasonalStrength  Float
+  qualityMomentum   Float
+
+  // Relationships
+  supplierComponents SupplierComponent[]
+  locationSuppliers  LocationSupplier[]
+  ComponentInventory ComponentInventory[]
+  Delivery           Delivery[]
+  ComponentFailure   ComponentFailure[]
+
+  @@map("suppliers")
+}
+
+model SupplierComponent {
+  supplierId   String
+  componentId  String
+  pricePerUnit Float
+
+  // Relationships
+  supplier  Supplier  @relation(fields: [supplierId], references: [id])
+  component Component @relation(fields: [componentId], references: [id])
+
+  @@id([supplierId, componentId])
+  @@map("supplier_components")
+}
+
+model TractorModel {
+  id                String @id
+  marketSensitivity Float
+  priceSensitivity  Float
+
+  // Relationships
+  modelComponents     ModelComponent[]
+  locationPreferences LocationModelPreference[]
+  DailyModelDemand    DailyModelDemand[]
+  DemandForecast      DemandForecast[]
+
+  @@map("tractor_models")
+}
+
+model ModelComponent {
+  modelId     String
+  componentId String
+
+  // Relationships
+  model     TractorModel @relation(fields: [modelId], references: [id])
+  component Component    @relation(fields: [componentId], references: [id])
+
+  @@id([modelId, componentId])
+  @@map("model_components")
+}
+
+model Location {
+  id String @id
+
+  // Relationships
+  suppliers           LocationSupplier[]
+  modelPreferences    LocationModelPreference[]
+  LocationDailyReport LocationDailyReport[]
+  DemandForecast      DemandForecast[]
+
+  @@map("locations")
+}
+
+model LocationSupplier {
+  locationId String
+  supplierId String
+
+  // Relationships
+  location Location @relation(fields: [locationId], references: [id])
+  supplier Supplier @relation(fields: [supplierId], references: [id])
+
+  @@id([locationId, supplierId])
+  @@map("location_suppliers")
+}
+
+model LocationModelPreference {
+  locationId String
+  modelId    String
+  preference Float
+
+  // Relationships
+  location Location     @relation(fields: [locationId], references: [id])
+  model    TractorModel @relation(fields: [modelId], references: [id])
+
+  @@id([locationId, modelId])
+  @@map("location_model_preferences")
+}
+
+// Time-series models
+model DailyReport {
+  id   String   @id @default(cuid())
+  date DateTime
+
+  // One-to-many relationship with location reports
+  locationReports LocationDailyReport[]
+
+  @@index([date])
+  @@map("daily_reports")
+}
+
+model LocationDailyReport {
+  id               String   @id @default(cuid())
+  date             DateTime
+  locationId       String
+  marketTrendIndex Float
+  inflationRate    Float
+
+  // Relationships
+  location      Location    @relation(fields: [locationId], references: [id])
+  dailyReport   DailyReport @relation(fields: [dailyReportId], references: [id])
+  dailyReportId String
+
+  // One-to-many relationships
+  modelDemand DailyModelDemand[]
+  inventory   ComponentInventory[]
+  deliveries  Delivery[]
+  failures    ComponentFailure[]
+
+  @@unique([date, locationId])
+  @@index([date, locationId])
+  @@map("location_daily_reports")
+}
+
+model DailyModelDemand {
+  id          String @id @default(cuid())
+  demandUnits Int
+
+  // Relationships
+  modelId          String
+  model            TractorModel        @relation(fields: [modelId], references: [id])
+  locationReport   LocationDailyReport @relation(fields: [locationReportId], references: [id])
+  locationReportId String
+
+  @@index([modelId])
+  @@map("daily_model_demand")
+}
+
+model ComponentInventory {
+  id       String @id @default(cuid())
+  quantity Int
+
+  // Relationships
+  supplierId       String
+  componentId      String
+  supplier         Supplier            @relation(fields: [supplierId], references: [id])
+  component        Component           @relation(fields: [componentId], references: [id])
+  locationReport   LocationDailyReport @relation(fields: [locationReportId], references: [id])
+  locationReportId String
+
+  @@index([supplierId, componentId])
+  @@index([locationReportId])
+  @@map("component_inventory")
+}
+
+model Delivery {
+  id               String @id @default(cuid())
+  orderSize        Int
+  leadTimeVariance Int
+  discount         Float
+
+  // Relationships
+  supplierId       String
+  componentId      String
+  supplier         Supplier            @relation(fields: [supplierId], references: [id])
+  component        Component           @relation(fields: [componentId], references: [id])
+  locationReport   LocationDailyReport @relation(fields: [locationReportId], references: [id])
+  locationReportId String
+
+  @@index([supplierId, componentId])
+  @@index([locationReportId])
+  @@map("deliveries")
+}
+
+model ComponentFailure {
+  id          String @id @default(cuid())
+  failureRate Float
+
+  // Relationships
+  supplierId       String
+  componentId      String
+  supplier         Supplier            @relation(fields: [supplierId], references: [id])
+  component        Component           @relation(fields: [componentId], references: [id])
+  locationReport   LocationDailyReport @relation(fields: [locationReportId], references: [id])
+  locationReportId String
+
+  @@index([supplierId, componentId])
+  @@index([locationReportId])
+  @@map("component_failures")
+}
+
+// Removing the old AnalysisResult model and replacing with SupplyChainAnalysis
+model SupplyChainAnalysis {
+  id      String   @id @default(cuid())
+  date    DateTime
+  version String // To track different analysis versions/approaches
+
+  // Structured JSON results for different analysis components
+  supplierPerformance Json // Supplier performance profiles
+  demandPatterns      Json // Demand pattern summaries
+  componentRisks      Json // Component risk assessments
+  inventoryParameters Json // Inventory optimization parameters
+
+  createdAt DateTime @default(now())
+
+  @@map("supply_chain_analyses")
+}
+
+model DemandForecast {
+  id              String   @id @default(cuid())
+  name            String
+  createdAt       DateTime @default(now())
+  locationId      String
+  modelId         String
+  isDefault       Boolean  @default(false)
+  summary         Json
+  forecastData    Json
+  historicalData  Json
+  futureMti       Float[] // Store MTI values as a native array
+  futureInflation Float[] // Store inflation values as a native array
+
+  // References
+  location Location     @relation(fields: [locationId], references: [id])
+  model    TractorModel @relation(fields: [modelId], references: [id])
+
+  @@unique([locationId, modelId, isDefault])
+  @@map("demand_forecasts")
+}
+
+model SupplierPerformanceForecast {
+  id               String   @id @default(cuid())
+  supplierId       String
+  createdAt        DateTime @default(now())
+  qualityForecast  Json
+  leadTimeForecast Json
+  historicalData   Json
+
+  @@index([supplierId])
+}
+
+// Add these models to your schema.prisma file
+
+model SupplierAllocationStrategy {
+  id                   String                @id @default(uuid())
+  componentId          String
+  locationId           String
+  createdAt            DateTime
+  overallStrategy      String
+  demandForecast       Json
+  supplierAllocations  SupplierAllocation[]
+  RecommendationImpact RecommendationImpact?
+}
+
+model SupplierAllocation {
+  id                   String                     @id @default(uuid())
+  strategyId           String
+  strategy             SupplierAllocationStrategy @relation(fields: [strategyId], references: [id])
+  supplierId           String
+  allocationPercentage Float
+  currentScore         Float
+  futureScore          Float
+  weightedScore        Float
+  reasoning            String
+  quarterlyQuantities  Json
+  enhancedReasoning    EnhancedReasoning?
+}
+
+model EnhancedReasoning {
+  id                  String             @id @default(uuid())
+  allocationId        String             @unique
+  allocation          SupplierAllocation @relation(fields: [allocationId], references: [id])
+  summary             String
+  keyFactors          Json
+  comparisons         Json
+  detailedExplanation String             @db.Text
+}
+
+// Update the RecommendationImpact model
+model RecommendationImpact {
+  id         String                     @id @default(uuid())
+  strategyId String                     @unique
+  strategy   SupplierAllocationStrategy @relation(fields: [strategyId], references: [id])
+
+  // Existing fields (total across all quarters)
+  unitDelta     Int
+  costDelta     Float
+  riskDelta     Float
+  priorityScore Float
+  status        String // 'optimal', 'warning', or 'critical'
+
+  // Existing actual values (total across all quarters)
+  currentUnits     Int
+  currentCost      Float
+  recommendedUnits Int
+  recommendedCost  Float
+
+  // New quarterly fields
+  q1UnitDelta        Int
+  q1CostDelta        Float
+  q1CurrentUnits     Int
+  q1CurrentCost      Float
+  q1RecommendedUnits Int
+  q1RecommendedCost  Float
+
+  q2UnitDelta        Int
+  q2CostDelta        Float
+  q2CurrentUnits     Int
+  q2CurrentCost      Float
+  q2RecommendedUnits Int
+  q2RecommendedCost  Float
+
+  // Add new prioritization fields
+  urgency                  String // 'immediate', 'upcoming', or 'future'
+  impactLevel              String // 'high', 'moderate', or 'low'
+  priority                 String // 'critical', 'important', 'standard', or 'optional'
+  opportunityScore         Float
+  structuredRecommendation Json?
+
+  createdAt DateTime @default(now())
+}
+
+// Add this model to your schema.prisma file
+model QuarterlyDemandOutlook {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  isDefault Boolean  @default(false)
+
+  // Time points for x-axis
+  quarters Json // Array of quarter labels (e.g., "Q1 2022")
+
+  // Line chart data
+  historicalDemand Json // Array of historical demand values
+  forecastDemand   Json // Array of forecast demand values
+  upperBound       Json // Array of upper bound values
+  lowerBound       Json // Array of lower bound values
+
+  // Bar chart data
+  yoyGrowth Json // Object with year2OverYear1, year3OverYear2, forecastOverYear3 arrays
+
+  // Highlights data
+  keyPatterns          Json // Array of key pattern strings
+  predictionBasis      Json // Array of prediction basis strings
+  businessImplications Json // Array of business implication strings
+
+  // Metadata for annotations
+  seasonalPeaks Json // Array of seasonal peak objects
+
+  // ML model metadata
+  confidenceInterval  Float
+  seasonalityStrength Float
+  trendStrength       Float
+  rmse                Float // Root Mean Square Error
+
+  @@map("quarterly_demand_outlooks")
+}
+
+// Add this model to your schema.prisma file
+model ModelDemandByLocation {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  isDefault Boolean  @default(false)
+
+  // Structured data for each location
+  locationData Json // Record<LocationId, LocationModelDemand>
+
+  // Highlights and insights
+  highlights Json // { locationProfiles, modelTrends, businessInsights }
+
+  @@map("model_demand_by_location")
+}
+
+// Add this model to your schema.prisma file
+model QuarterlyRecommendationCard {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Basic identifiers
+  locationId  String
+  componentId String
+  quarter     Int
+  year        Int
+
+  // Current strategy data
+  currentUnits Int
+  currentCost  Float
+
+  // Recommended strategy data
+  recommendedUnits Int
+  recommendedCost  Float
+
+  // Impact data
+  unitDelta Int
+  costDelta Float
+
+  // Prioritization data
+  urgency          String // RecommendationUrgency as string
+  impactLevel      String // RecommendationImpactLevel as string
+  priority         String // RecommendationPriority as string
+  opportunityScore Float
+
+  // Full strategy data - stored as JSON
+  strategy Json
+
+  // Indexes for efficient querying
+  @@index([locationId, componentId])
+  @@index([quarter, year])
+  @@index([priority])
+  @@index([opportunityScore])
+  @@map("quarterly_recommendation_cards")
+}
